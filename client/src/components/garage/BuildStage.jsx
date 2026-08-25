@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '../../state/store';
 import CarSVG from './CarSVG';
 import { sound } from '../../utils/soundEngine';
@@ -19,13 +19,12 @@ export default function BuildStage() {
   const stagesList = generatedStages || [];
   const stageData = stagesList[currentBuildStage - 1] || stagesList[0] || {
     stageNumber: 1,
-    title: 'STAGE 1: PRECISION TORQUE',
+    title: 'STAGE 1: PRECISION CALIBRATION',
     toolName: 'Pneumatic 1/2" Impact Gun',
     toolMaterial: 'Cast Iron & Brushed Steel',
-    toolIcon: '🔧',
     tasks: [
-      { id: 0, label: 'Torque Front Speed Wheel', detail: 'Drive titanium fasteners onto hub.', actionType: 'TAP', points: 100, pos: { top: '60%', left: '32%' }, icon: '🛞' },
-      { id: 1, label: 'Lock Rear Grip Slick', detail: 'Fasten center-lock lug nut to 450 lb-ft.', actionType: 'HOLD', points: 120, pos: { top: '60%', left: '68%' }, icon: '🏁' }
+      { id: 0, label: 'Torque Front Speed Wheel', detail: 'Drive titanium fasteners onto hub.', points: 100, pos: { top: '60%', left: '32%' }, icon: '🛞' },
+      { id: 1, label: 'Lock Rear Grip Slick', detail: 'Fasten center-lock lug nut to 450 lb-ft.', points: 120, pos: { top: '60%', left: '68%' }, icon: '🏁' }
     ]
   };
 
@@ -39,9 +38,6 @@ export default function BuildStage() {
   const [stageCompleteBanner, setStageCompleteBanner] = useState(false);
   const [feedbackPop, setFeedbackPop] = useState(null);
   const [cameraShake, setCameraShake] = useState(false);
-  const [holdProgress, setHoldProgress] = useState(0);
-  const [isHolding, setIsHolding] = useState(false);
-  const holdIntervalRef = useRef(null);
 
   const currentTask = stageData.tasks[activeTaskIndex] || stageData.tasks[0];
 
@@ -49,8 +45,6 @@ export default function BuildStage() {
     setActiveTaskIndex(0);
     setCompletedTaskCount(0);
     setStageCompleteBanner(false);
-    setHoldProgress(0);
-    setIsHolding(false);
   }, [currentBuildStage]);
 
   useEffect(() => {
@@ -72,8 +66,11 @@ export default function BuildStage() {
     setHasStarted(true);
   };
 
-  // Complete active task
-  const triggerTaskCompletion = (e) => {
+  // Competitive tap-to-torque handler
+  const handleTapAction = (e) => {
+    e.stopPropagation();
+    if (!hasStarted || stageCompleteBanner) return;
+
     sound.playPartInstall();
     setCameraShake(true);
     setTimeout(() => setCameraShake(false), 160);
@@ -104,53 +101,6 @@ export default function BuildStage() {
       }, 350);
     } else {
       setActiveTaskIndex(prev => prev + 1);
-      setHoldProgress(0);
-      setIsHolding(false);
-    }
-  };
-
-  // Tap-to-torque handler
-  const handleTapAction = (e) => {
-    e.stopPropagation();
-    if (!hasStarted || currentTask.actionType === 'HOLD') return;
-    triggerTaskCompletion(e);
-  };
-
-  // Press-and-hold radial torque handler
-  const handleHoldStart = (e) => {
-    e.stopPropagation();
-    if (!hasStarted || currentTask.actionType !== 'HOLD' || isHolding) return;
-
-    setIsHolding(true);
-    sound.playRatchet();
-
-    let prog = 0;
-    holdIntervalRef.current = setInterval(() => {
-      prog += 12;
-      setHoldProgress(Math.min(prog, 100));
-
-      if (prog % 24 === 0) {
-        sound.playRatchet();
-        try {
-          if (navigator.vibrate) navigator.vibrate(20);
-        } catch (err) {}
-      }
-
-      if (prog >= 100) {
-        clearInterval(holdIntervalRef.current);
-        triggerTaskCompletion(e);
-      }
-    }, 50);
-  };
-
-  const handleHoldEnd = () => {
-    if (holdIntervalRef.current) {
-      clearInterval(holdIntervalRef.current);
-      holdIntervalRef.current = null;
-    }
-    if (holdProgress < 100) {
-      setHoldProgress(0);
-      setIsHolding(false);
     }
   };
 
@@ -166,8 +116,6 @@ export default function BuildStage() {
       className={`h-[calc(100dvh-54px)] max-h-[100dvh] flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto font-sans relative select-none cursor-crosshair overflow-hidden bg-[#070a12] text-white transition-transform ${
         cameraShake ? 'translate-y-1 scale-[0.99]' : ''
       }`}
-      onMouseUp={handleHoldEnd}
-      onTouchEnd={handleHoldEnd}
     >
       
       {/* Crisp Instant Feedback Popups */}
@@ -225,12 +173,12 @@ export default function BuildStage() {
         </div>
       </div>
 
-      {/* 2. ACTIVE TOOL & DIRECTIVE CARD (Positioned Above Car Area) */}
+      {/* 2. ACTIVE TOOL & DIRECTIVE CARD */}
       <div className="bg-[#121824] border-2 border-slate-700/80 rounded-2xl p-3 sm:p-3.5 shadow-xl shrink-0 my-1">
         <div className="flex items-center justify-between text-xs font-mono font-bold text-amber-400 uppercase tracking-wider mb-0.5">
           <div className="flex items-center gap-1.5">
             <span>{currentTask.icon}</span>
-            <span>DIRECTIVE: {currentTask.actionType === 'HOLD' ? 'PRESS & HOLD' : 'TAP TO TORQUE'}</span>
+            <span>DIRECTIVE: TAP TO CALIBRATE</span>
           </div>
           <span className="text-[11px] text-emerald-400 font-black">
             +{currentTask.points || 100} PTS
@@ -246,7 +194,7 @@ export default function BuildStage() {
         </p>
       </div>
 
-      {/* 3. HERO GAMEPLAY CAR CANVAS & MECHANICAL TARGETS */}
+      {/* 3. HERO GAMEPLAY CAR CANVAS & COMPETITIVE TARGETS */}
       <div className="flex-1 flex flex-col items-center justify-center relative w-full my-auto py-1 overflow-visible">
         
         <CarSVG 
@@ -278,74 +226,29 @@ export default function BuildStage() {
             </div>
           )}
 
-          {/* ACTIVE HIGHLIGHTED MECHANICAL TOOL TARGET */}
+          {/* ACTIVE HIGHLIGHTED COMPETITIVE TOOL TARGET */}
           {hasStarted && !stageCompleteBanner && (
-            <div
+            <button
               key={`${currentBuildStage}-${activeTaskIndex}`}
-              className="absolute z-30 flex flex-col items-center select-none"
+              onClick={handleTapAction}
+              className="absolute z-30 flex flex-col items-center justify-center cursor-pointer group active:scale-90 transition-transform touch-manipulation"
               style={{ 
                 top: currentTask.pos.top, 
                 left: currentTask.pos.left, 
                 transform: 'translate(-50%, -50%)' 
               }}
             >
-              {currentTask.actionType === 'HOLD' ? (
-                /* PRESS-AND-HOLD RADIAL GAUGE BUTTON */
-                <button
-                  onMouseDown={handleHoldStart}
-                  onTouchStart={handleHoldStart}
-                  className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-transform touch-manipulation"
-                >
-                  {/* Outer SVG Radial Progress Ring */}
-                  <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
-                    <circle
-                      cx="50%"
-                      cy="50%"
-                      r="40%"
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="6"
-                      fill="transparent"
-                    />
-                    <circle
-                      cx="50%"
-                      cy="50%"
-                      r="40%"
-                      stroke="#f59e0b"
-                      strokeWidth="6"
-                      fill="transparent"
-                      strokeDasharray="251"
-                      strokeDashoffset={251 - (251 * holdProgress) / 100}
-                      strokeLinecap="round"
-                    />
-                  </svg>
+              <div className="absolute w-14 h-14 sm:w-18 sm:h-18 rounded-full border-3 border-amber-400 animate-ping opacity-75 pointer-events-none"></div>
+              <div className="absolute w-14 h-14 sm:w-18 sm:h-18 rounded-full border-2 border-dashed border-amber-300 animate-[spin_4s_linear_infinite] pointer-events-none"></div>
 
-                  {/* Inner Tool Core */}
-                  <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-gradient-to-br from-red-600 to-amber-500 text-white border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-2xl">
-                    {currentTask.icon}
-                  </div>
+              <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-red-600 text-black border-2 border-white shadow-[0_0_25px_rgba(245,158,11,1)] flex items-center justify-center text-xl sm:text-2xl font-black">
+                {currentTask.icon}
+              </div>
 
-                  <div className="absolute -bottom-5 px-2 py-0.5 rounded-full bg-black/90 border border-amber-400 text-[9px] font-mono font-black text-amber-300 uppercase whitespace-nowrap">
-                    {isHolding ? `${holdProgress}%` : 'HOLD 👇'}
-                  </div>
-                </button>
-              ) : (
-                /* TAP-TO-TORQUE BUTTON */
-                <button
-                  onClick={handleTapAction}
-                  className="relative flex flex-col items-center justify-center cursor-pointer group active:scale-90 transition-transform touch-manipulation"
-                >
-                  <div className="absolute w-14 h-14 sm:w-18 sm:h-18 rounded-full border-2 border-dashed border-amber-300 animate-[spin_4s_linear_infinite] pointer-events-none"></div>
-
-                  <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-red-600 text-black border-2 border-white shadow-[0_0_25px_rgba(245,158,11,1)] flex items-center justify-center text-xl sm:text-2xl font-black">
-                    {currentTask.icon}
-                  </div>
-
-                  <div className="mt-1 px-2 py-0.5 rounded-full bg-black/90 border border-amber-400 text-[9px] font-mono font-black text-amber-300 uppercase tracking-widest whitespace-nowrap shadow-lg">
-                    TAP HERE 👆
-                  </div>
-                </button>
-              )}
-            </div>
+              <div className="mt-1 px-2 py-0.5 rounded-full bg-black/90 border border-amber-400 text-[9px] font-mono font-black text-amber-300 uppercase tracking-widest whitespace-nowrap shadow-lg">
+                TAP HERE 👆
+              </div>
+            </button>
           )}
 
           {/* Celebratory Banner on Stage Finish */}
