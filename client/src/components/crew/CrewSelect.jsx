@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CrewSelect() {
   const { setSelectedCrew, setPlayerName, setUserId, setAttemptId, setBuildStartTime, advanceState } = useGameStore();
-  const [crews, setCrews] = useState(ORIGINAL_CREWS);
+  const [crews] = useState(ORIGINAL_CREWS);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [name, setName] = useState('');
   const [nameValidation, setNameValidation] = useState({ isValid: false, error: null });
@@ -63,7 +63,6 @@ export default function CrewSelect() {
     sound.playEngineRev();
     sound.playNitroBlast();
 
-    // Mobile Haptic Confirmation
     try {
       if (navigator.vibrate) navigator.vibrate([50, 40, 120]);
     } catch (e) {}
@@ -75,7 +74,7 @@ export default function CrewSelect() {
       try {
         const userRes = await userApi.create({
           name: validation.sanitized,
-          crewId: selectedCrew.id || selectedCrew._id
+          crewId: selectedCrew.id || selectedCrew._id || selectedCrew.slug
         });
         if (userRes?.data?._id) {
           userId = userRes.data._id;
@@ -99,7 +98,7 @@ export default function CrewSelect() {
       }, 400);
 
     } catch (err) {
-      console.error('Fatal submit error:', err);
+      console.error('Submit fallback error:', err);
       setSelectedCrew(selectedCrew);
       setPlayerName(validation.sanitized);
       setUserId(`user_local_${Date.now()}`);
@@ -229,34 +228,36 @@ export default function CrewSelect() {
             className="absolute bottom-7 w-3/5 h-5 rounded-[100%] bg-black/90 blur-md pointer-events-none"
           />
 
-          {/* Drop-and-Hover Original Race Car */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedCrew.slug}
-              initial={{ y: -80, opacity: 0, scale: 0.85 }}
-              animate={{ 
-                y: isLaunching ? -300 : [0, -12, 0],
-                opacity: isLaunching ? 0 : 1,
-                scale: isLaunching ? 1.3 : 1
-              }}
-              exit={{ y: 60, opacity: 0, scale: 0.85 }}
-              transition={
-                isLaunching 
-                  ? { duration: 0.45, ease: "easeIn" }
-                  : {
-                      y: { repeat: Infinity, duration: 3.2, ease: "easeInOut" },
-                      opacity: { duration: 0.25 }
-                    }
-              }
-              className="relative z-10 w-full max-w-[320px] aspect-[16/9] flex items-center justify-center"
-            >
-              <img 
-                src={selectedCrew.image} 
-                alt={selectedCrew.name}
-                className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)] pointer-events-none"
-              />
-            </motion.div>
-          </AnimatePresence>
+          {/* Robust Car Image Container with Clean Keyed Transitions (No mode="wait" Deadlock) */}
+          <div className="relative z-10 w-full max-w-[320px] aspect-[16/9] flex items-center justify-center">
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={selectedCrew.slug}
+                initial={{ opacity: 0, scale: 0.85, y: -20 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: isLaunching ? 1.3 : 1,
+                  y: isLaunching ? -300 : 0 
+                }}
+                exit={{ opacity: 0, scale: 0.85, y: 20 }}
+                transition={{ duration: 0.25 }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                {/* Floating Bob Animation Child */}
+                <motion.div
+                  animate={{ y: isLaunching ? 0 : [0, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 3.0, ease: "easeInOut" }}
+                  className="w-full h-full flex items-center justify-center"
+                >
+                  <img 
+                    src={selectedCrew.image} 
+                    alt={selectedCrew.name}
+                    className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)] pointer-events-none"
+                  />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Character Name & Voice Bark */}
           <div className="absolute bottom-0 text-center z-20">
@@ -386,7 +387,6 @@ export default function CrewSelect() {
                 textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(245,158,11,0.5)'
               }}
             />
-            {/* Live Visual Validation Icon */}
             <div className="ml-2">
               {name.trim().length > 0 && (
                 nameValidation.isValid ? (
@@ -399,14 +399,12 @@ export default function CrewSelect() {
           </div>
         </div>
 
-        {/* Live Validation Warning Text */}
         {name.trim().length > 0 && !nameValidation.isValid && nameValidation.error && (
           <div className="text-[10px] font-mono text-red-400 font-bold px-2 text-center">
             {nameValidation.error}
           </div>
         )}
 
-        {/* Heavy Mechanical Push-Button Trigger */}
         <button
           type="submit"
           disabled={loading || (name.trim().length > 0 && !nameValidation.isValid)}

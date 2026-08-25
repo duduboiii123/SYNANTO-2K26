@@ -35,6 +35,7 @@ export default function BuildStage() {
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
   const [completedTaskCount, setCompletedTaskCount] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [liveScore, setLiveScore] = useState(1200);
   const [stageCompleteBanner, setStageCompleteBanner] = useState(false);
   const [feedbackPop, setFeedbackPop] = useState(null);
   const [cameraShake, setCameraShake] = useState(false);
@@ -47,6 +48,7 @@ export default function BuildStage() {
     setStageCompleteBanner(false);
   }, [currentBuildStage]);
 
+  // Live Timer & Time-Decaying Score Telemetry
   useEffect(() => {
     if (!hasStarted) return;
     const timerInterval = setInterval(() => {
@@ -54,11 +56,18 @@ export default function BuildStage() {
         const ms = Date.now() - buildStartTime;
         setElapsedTime(ms);
         setBuildTotalTimeMs(ms);
+
+        // Real-time time decay calculation
+        const totalSec = Math.floor(ms / 1000);
+        const earnedBase = (bonusClicksHit || 0) * 100 + (currentBuildStage * 120);
+        const decayTime = Math.max(0, totalSec - 10);
+        const timeBonus = Math.max(50, 600 - (decayTime * 15));
+        setLiveScore(earnedBase + timeBonus);
       }
     }, 100);
 
     return () => clearInterval(timerInterval);
-  }, [hasStarted, buildStartTime, setBuildTotalTimeMs]);
+  }, [hasStarted, buildStartTime, setBuildTotalTimeMs, bonusClicksHit, currentBuildStage]);
 
   const handleStartGame = () => {
     sound.playClick();
@@ -75,7 +84,6 @@ export default function BuildStage() {
     setCameraShake(true);
     setTimeout(() => setCameraShake(false), 160);
 
-    // Haptic feedback pulse
     try {
       if (navigator.vibrate) navigator.vibrate([45, 30, 60]);
     } catch (err) {}
@@ -134,7 +142,7 @@ export default function BuildStage() {
         )}
       </AnimatePresence>
 
-      {/* 1. SINGLE CONSOLIDATED TOP HUD BAR */}
+      {/* 1. SINGLE CONSOLIDATED TOP HUD BAR WITH LIVE TIME-DECAYING SCORE */}
       <div className="bg-[#111726]/90 border border-white/15 rounded-2xl p-2.5 sm:p-3.5 shadow-2xl flex flex-col gap-2 shrink-0 z-[var(--z-hud)] backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -146,11 +154,12 @@ export default function BuildStage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono">
-            <span className="text-xs text-slate-300 font-bold">
-              TASK {completedTaskCount + 1}/{totalTasks}
-            </span>
-            <span className="text-base sm:text-lg font-black text-amber-400 tabular-nums">
+          {/* Live Decaying Score & Pit Stopwatch */}
+          <div className="flex items-center gap-2 sm:gap-3 font-mono">
+            <div className="px-2 py-0.5 rounded-lg bg-black/60 border border-amber-400/50 text-[10px] sm:text-xs font-black text-amber-300">
+              ⚡ {liveScore} PTS
+            </div>
+            <span className="text-base sm:text-lg font-black text-white tabular-nums">
               ⏱ {formatPitTime(elapsedTime)}
             </span>
           </div>
@@ -213,7 +222,7 @@ export default function BuildStage() {
                 PADDOCK POSITION READY
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 font-sans mb-4 max-w-xs">
-                Hold your heavy-metal tools and calibrate the racing machine before time expires!
+                Calibrate your machine as fast as possible to maximize your competitive time score!
               </p>
               <button
                 onClick={handleStartGame}

@@ -1,6 +1,7 @@
 import Attempt from '../models/Attempt.js';
 import User from '../models/User.js';
 import Crew from '../models/Crew.js';
+import EventConfig from '../models/EventConfig.js';
 import { computeScore } from '../utils/scoring.js';
 
 export const startAttempt = async (req, res, next) => {
@@ -41,10 +42,11 @@ export const completeAttempt = async (req, res, next) => {
     }
 
     if (attempt.completedAt) {
-      // If already completed, return existing
       const populated = await Attempt.findById(attempt._id).populate('user').populate('crew');
       return res.json(populated);
     }
+
+    const config = await EventConfig.getConfig();
 
     attempt.completedAt = Date.now();
     attempt.totalTimeMs = Math.max(1000, attempt.completedAt - (attempt.startedAt || (attempt.completedAt - 15000)));
@@ -54,7 +56,8 @@ export const completeAttempt = async (req, res, next) => {
     attempt.score = computeScore({
       stagesCompleted: attempt.stagesCompleted,
       bonusClicksHit: attempt.bonusClicksHit,
-      totalTimeMs: attempt.totalTimeMs
+      totalTimeMs: attempt.totalTimeMs,
+      difficulty: config.difficulty || 'MEDIUM'
     });
 
     if (attempt.stagesCompleted >= 5) {

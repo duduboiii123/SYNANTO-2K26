@@ -229,7 +229,6 @@ export default function RaceAnimation() {
           setRevealData(revealRes.data);
         }
       } catch (err) {
-        console.warn('Finish API warning, recording session locally:', err.message);
         setScore(1000 + (bonusClicksHit * 100));
         setRevealData({
           eventName: 'SYNANTO 2K26 SPEEDWAY',
