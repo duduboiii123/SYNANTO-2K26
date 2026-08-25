@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { ORIGINAL_CREWS } from '../data/crews';
+import { generateSessionStages } from '../utils/randomization';
+import { sanitizeCallSign } from '../utils/moderation';
 
 const GAME_STATES = [
   'CREW_SELECT',
@@ -18,12 +21,12 @@ export const useGameStore = create((set, get) => ({
   gameState: 'CREW_SELECT',
   
   playerName: '',
-  selectedCrew: null,
+  selectedCrew: ORIGINAL_CREWS[0],
   userId: null,
   attemptId: null,
   
-  crews: [],
-  milestones: [],
+  crews: ORIGINAL_CREWS,
+  generatedStages: generateSessionStages(),
   currentBuildStage: 0,
   bonusClicksHit: 0,
   totalComponentsInstalled: 0,
@@ -32,8 +35,12 @@ export const useGameStore = create((set, get) => ({
   score: null,
   
   revealData: null,
-  
+  isMuted: false,
+
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+
   setGameState: (state) => set({ gameState: state }),
+  
   advanceState: () => {
     const current = get().gameState;
     const idx = GAME_STATES.indexOf(current);
@@ -51,15 +58,14 @@ export const useGameStore = create((set, get) => ({
       set(updates);
     }
   },
-  setPlayerInfo: ({ name }) => set({ playerName: name }),
-  setPlayerName: (name) => set({ playerName: name }),
+
+  setPlayerName: (rawName) => set({ playerName: sanitizeCallSign(rawName) }),
   selectCrew: (crew) => set({ selectedCrew: crew }),
   setSelectedCrew: (crew) => set({ selectedCrew: crew }),
   setUserId: (id) => set({ userId: id }),
   setAttemptId: (id) => set({ attemptId: id }),
   setBuildStartTime: (time) => set({ buildStartTime: time }),
   setCrews: (crews) => set({ crews }),
-  setMilestones: (milestones) => set({ milestones }),
   incrementBonusClicks: () => set((state) => ({ bonusClicksHit: state.bonusClicksHit + 1 })),
   incrementComponentInstalled: () => set((state) => ({ 
     totalComponentsInstalled: state.totalComponentsInstalled + 1,
@@ -68,10 +74,12 @@ export const useGameStore = create((set, get) => ({
   setBuildTotalTimeMs: (timeMs) => set({ buildTotalTimeMs: timeMs }),
   setScore: (score) => set({ score }),
   setRevealData: (data) => set({ revealData: data }),
+  
   resetGame: () => set({
     gameState: 'CREW_SELECT',
     playerName: '',
-    selectedCrew: null,
+    selectedCrew: ORIGINAL_CREWS[0],
+    generatedStages: generateSessionStages(),
     userId: null,
     attemptId: null,
     currentBuildStage: 0,

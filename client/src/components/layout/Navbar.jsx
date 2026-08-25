@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useGameStore } from '../../state/store';
 import { sound } from '../../utils/soundEngine';
 
 export default function Navbar() {
-  const { playerName, selectedCrew } = useGameStore();
-  const [isMuted, setIsMuted] = useState(sound.getMuted());
+  const { playerName, selectedCrew, isMuted, toggleMute } = useGameStore();
+
+  const handleMuteClick = () => {
+    const nextMuted = !isMuted;
+    sound.setMuted(nextMuted);
+    toggleMute();
+    if (!nextMuted) sound.playClick();
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full px-2 sm:px-6 py-1.5 sm:py-3">
-      <div className="max-w-7xl mx-auto glass-panel rounded-xl sm:rounded-2xl px-3 sm:px-6 py-1.5 sm:py-3 flex items-center justify-between shadow-2xl border border-white/15">
+    <header className="sticky top-0 z-[var(--z-header)] w-full px-2 sm:px-6 py-1.5 sm:py-2.5">
+      <div className="max-w-7xl mx-auto glass-panel rounded-xl sm:rounded-2xl px-3 sm:px-6 py-1.5 sm:py-2.5 flex items-center justify-between shadow-2xl border border-white/15">
         
         {/* WCE ACM Student Chapter Synanto 2K26 Branding */}
         <div className="flex items-center gap-2 sm:gap-4">
           <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-            <div className="relative p-1 sm:p-2 rounded-xl bg-white/10 border border-white/20 group-hover:border-cyan-400/60 transition-all duration-300 shadow-md">
+            <div className="relative p-1 sm:p-1.5 rounded-xl bg-white/10 border border-white/20 group-hover:border-cyan-400/60 transition-all duration-300 shadow-md">
               <img 
                 src="/assets/logo/wce-acm-logo.png" 
                 alt="WCE ACM Logo" 
-                className="h-7 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 filter drop-shadow-md"
+                className="h-7 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105 filter drop-shadow-md"
               />
             </div>
             
@@ -43,11 +49,7 @@ export default function Navbar() {
           
           {/* Sound FX Toggle */}
           <button
-            onClick={() => {
-              const newMute = sound.toggleMute();
-              setIsMuted(newMute);
-              if (!newMute) sound.playClick();
-            }}
+            onClick={handleMuteClick}
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
             className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition-all cursor-pointer text-xs sm:text-sm font-mono flex items-center justify-center ${
               isMuted
@@ -58,20 +60,11 @@ export default function Navbar() {
             <span>{isMuted ? '🔇' : '🔊'}</span>
           </button>
 
-          {playerName ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg sm:rounded-xl bg-white/10 border border-white/15 font-mono text-[10px] sm:text-xs shadow-inner">
-              <span 
-                className="w-2 h-2 rounded-full animate-pulse shrink-0" 
-                style={{ backgroundColor: selectedCrew?.colorPrimary || '#ef4444' }}
-              ></span>
-              <span className="font-bold text-white max-w-[80px] sm:max-w-[150px] truncate">
-                {playerName}
-              </span>
-            </div>
-          ) : (
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 font-mono text-[10px] text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              <span className="font-bold text-emerald-400">PADDOCK READY</span>
+          {/* Active Player Chip */}
+          {playerName && (
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg sm:rounded-xl bg-black/60 border border-amber-400/40 text-amber-300 font-mono text-[10px] sm:text-xs font-bold truncate max-w-[120px] sm:max-w-[180px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="truncate">{playerName}</span>
             </div>
           )}
         </div>
