@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useGameStore } from '../../state/store';
 import CarSVG from './CarSVG';
 import { sound } from '../../utils/soundEngine';
+import { getRandomTapPosition } from '../../utils/randomization';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BuildStage() {
@@ -39,14 +40,23 @@ export default function BuildStage() {
   const [stageCompleteBanner, setStageCompleteBanner] = useState(false);
   const [feedbackPop, setFeedbackPop] = useState(null);
   const [cameraShake, setCameraShake] = useState(false);
+  const [dynamicPos, setDynamicPos] = useState({ top: '50%', left: '50%' });
 
   const currentTask = stageData.tasks[activeTaskIndex] || stageData.tasks[0];
 
+  // Set fresh randomized position when task or stage changes
   useEffect(() => {
     setActiveTaskIndex(0);
     setCompletedTaskCount(0);
     setStageCompleteBanner(false);
+    setDynamicPos(currentTask?.pos || getRandomTapPosition());
   }, [currentBuildStage]);
+
+  useEffect(() => {
+    if (currentTask) {
+      setDynamicPos(currentTask.pos || getRandomTapPosition());
+    }
+  }, [activeTaskIndex]);
 
   // Live Timer & Time-Decaying Score Telemetry
   useEffect(() => {
@@ -75,12 +85,13 @@ export default function BuildStage() {
     setHasStarted(true);
   };
 
-  // Competitive tap-to-torque handler
+  // Competitive tap action with varied sound effects and randomized target jump
   const handleTapAction = (e) => {
     e.stopPropagation();
     if (!hasStarted || stageCompleteBanner) return;
 
-    sound.playPartInstall();
+    // Play dynamic cycling sound effect (pneumatic, laser, torque, hydraulic, carbon)
+    sound.playDynamicTapSound();
     setCameraShake(true);
     setTimeout(() => setCameraShake(false), 160);
 
@@ -109,6 +120,8 @@ export default function BuildStage() {
       }, 350);
     } else {
       setActiveTaskIndex(prev => prev + 1);
+      // Immediately reposition next target to a fresh randomized coordinate
+      setDynamicPos(getRandomTapPosition());
     }
   };
 
@@ -187,7 +200,7 @@ export default function BuildStage() {
         <div className="flex items-center justify-between text-xs font-mono font-bold text-amber-400 uppercase tracking-wider mb-0.5">
           <div className="flex items-center gap-1.5">
             <span>{currentTask.icon}</span>
-            <span>DIRECTIVE: TAP TO CALIBRATE</span>
+            <span>DIRECTIVE: TAP TARGET RETICLE</span>
           </div>
           <span className="text-[11px] text-emerald-400 font-black">
             +{currentTask.points || 100} PTS
@@ -203,7 +216,7 @@ export default function BuildStage() {
         </p>
       </div>
 
-      {/* 3. HERO GAMEPLAY CAR CANVAS & COMPETITIVE TARGETS */}
+      {/* 3. HERO GAMEPLAY CAR CANVAS & RANDOMIZED TAP TARGETS */}
       <div className="flex-1 flex flex-col items-center justify-center relative w-full my-auto py-1 overflow-visible">
         
         <CarSVG 
@@ -222,7 +235,7 @@ export default function BuildStage() {
                 PADDOCK POSITION READY
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 font-sans mb-4 max-w-xs">
-                Calibrate your machine as fast as possible to maximize your competitive time score!
+                Tap the moving target reticles across the vehicle to complete the calibration sprint!
               </p>
               <button
                 onClick={handleStartGame}
@@ -235,29 +248,35 @@ export default function BuildStage() {
             </div>
           )}
 
-          {/* ACTIVE HIGHLIGHTED COMPETITIVE TOOL TARGET */}
+          {/* ACTIVE DYNAMIC RANDOMIZED TARGET BUTTON */}
           {hasStarted && !stageCompleteBanner && (
-            <button
-              key={`${currentBuildStage}-${activeTaskIndex}`}
+            <motion.button
+              key={`target-${currentBuildStage}-${activeTaskIndex}`}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 450, damping: 20 }}
               onClick={handleTapAction}
               className="absolute z-30 flex flex-col items-center justify-center cursor-pointer group active:scale-90 transition-transform touch-manipulation"
               style={{ 
-                top: currentTask.pos.top, 
-                left: currentTask.pos.left, 
+                top: dynamicPos.top, 
+                left: dynamicPos.left, 
                 transform: 'translate(-50%, -50%)' 
               }}
             >
-              <div className="absolute w-14 h-14 sm:w-18 sm:h-18 rounded-full border-3 border-amber-400 animate-ping opacity-75 pointer-events-none"></div>
-              <div className="absolute w-14 h-14 sm:w-18 sm:h-18 rounded-full border-2 border-dashed border-amber-300 animate-[spin_4s_linear_infinite] pointer-events-none"></div>
+              {/* Outer Pulsing Kinetic Target Rings */}
+              <div className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border-3 border-amber-400 animate-ping opacity-75 pointer-events-none"></div>
+              <div className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-dashed border-cyan-400 animate-[spin_3s_linear_infinite] pointer-events-none"></div>
 
-              <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-red-600 text-black border-2 border-white shadow-[0_0_25px_rgba(245,158,11,1)] flex items-center justify-center text-xl sm:text-2xl font-black">
+              {/* Central Target Reticle */}
+              <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-red-600 text-black border-2 border-white shadow-[0_0_30px_rgba(245,158,11,1)] flex items-center justify-center text-xl sm:text-2xl font-black">
                 {currentTask.icon}
               </div>
 
-              <div className="mt-1 px-2 py-0.5 rounded-full bg-black/90 border border-amber-400 text-[9px] font-mono font-black text-amber-300 uppercase tracking-widest whitespace-nowrap shadow-lg">
-                TAP HERE 👆
+              {/* Stamped Badge */}
+              <div className="mt-1 px-2.5 py-0.5 rounded-full bg-black/90 border border-amber-400 text-[9px] font-mono font-black text-amber-300 uppercase tracking-widest whitespace-nowrap shadow-lg">
+                TAP {currentTask.icon}
               </div>
-            </button>
+            </motion.button>
           )}
 
           {/* Celebratory Banner on Stage Finish */}
@@ -284,7 +303,7 @@ export default function BuildStage() {
       {/* 4. BOTTOM ACTIVE TOOL SPEC */}
       <div className="p-2 sm:p-2.5 rounded-xl bg-[#0e1422] border border-white/15 flex items-center justify-between font-mono text-[10px] sm:text-xs text-slate-400 shrink-0">
         <div className="flex items-center gap-2">
-          <span>⚙ ACTIVE:</span>
+          <span>⚙ ACTIVE TOOL:</span>
           <span className="text-white font-bold">{stageData.toolName}</span>
         </div>
         <div className="text-amber-400 font-bold">
