@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useGameStore } from '../../state/store';
 import { sound } from '../../utils/soundEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { attemptApi, eventApi } from '../../api/client';
 
 export default function RaceAnimation() {
-  const { advanceState, selectedCrew, setRevealData, setScore, attemptId, bonusClicksHit } = useGameStore();
+  const { setGameState, selectedCrew, setRevealData, setScore, attemptId, bonusClicksHit } = useGameStore();
   
   // Dynamic Racing States
   const [speed, setSpeed] = useState(0);
@@ -15,13 +15,23 @@ export default function RaceAnimation() {
   const [nitroCharges, setNitroCharges] = useState(2);
   const [isFinishing, setIsFinishing] = useState(false);
   const [distanceMeters, setDistanceMeters] = useState(1000);
+  const hasTransitionedRef = useRef(false);
 
   const primary = selectedCrew?.colorPrimary || '#ef4444';
+
+  const handleAdvanceToResults = () => {
+    if (hasTransitionedRef.current) return;
+    hasTransitionedRef.current = true;
+    console.log('Advancing from RaceAnimation to FINAL_POSTER');
+    setGameState('FINAL_POSTER');
+  };
 
   useEffect(() => {
     let speedInterval;
     let distInterval;
-    let finishTimer;
+    let finishTriggerTimer;
+    let autoAdvanceTimer;
+    let redundantSafetyTimer;
 
     sound.playEngineRev();
     sound.playNitroBlast();
@@ -30,7 +40,7 @@ export default function RaceAnimation() {
       if (navigator.vibrate) navigator.vibrate([60, 40, 100]);
     } catch (e) {}
 
-    // Speedometer acceleration from 0 to 250+ MPH
+    // Speedometer acceleration
     speedInterval = setInterval(() => {
       setSpeed(prev => {
         if (prev < 248) {
@@ -53,8 +63,8 @@ export default function RaceAnimation() {
       });
     }, 75);
 
-    // Finish line breach after 3.8s
-    finishTimer = setTimeout(async () => {
+    // Trigger Finish Gate at 3.2s
+    finishTriggerTimer = setTimeout(async () => {
       setIsFinishing(true);
       sound.playVictoryFanfare();
       try {
@@ -66,11 +76,16 @@ export default function RaceAnimation() {
           stagesCompleted: 5,
           bonusClicksHit: bonusClicksHit
         });
-        setScore(completeRes.data.score);
+        if (completeRes?.data?.score) {
+          setScore(completeRes.data.score);
+        }
 
         const revealRes = await eventApi.getReveal(attemptId);
-        setRevealData(revealRes.data);
+        if (revealRes?.data) {
+          setRevealData(revealRes.data);
+        }
       } catch (err) {
+        console.warn('Finish API warning, recording session locally:', err.message);
         setScore(1000 + (bonusClicksHit * 100));
         setRevealData({
           eventName: 'SYNANTO 2K26 SPEEDWAY',
@@ -80,17 +95,26 @@ export default function RaceAnimation() {
         });
       }
 
-      setTimeout(() => {
-        advanceState();
-      }, 950);
-    }, 3800);
+      // Smooth auto-transition after finish animation
+      autoAdvanceTimer = setTimeout(() => {
+        handleAdvanceToResults();
+      }, 1200);
+    }, 3200);
+
+    // Redundant safety timer: guaranteed advance after 4.8s
+    redundantSafetyTimer = setTimeout(() => {
+      console.log('Safety fallback triggered: ensuring advance to results');
+      handleAdvanceToResults();
+    }, 4800);
 
     return () => {
       clearInterval(speedInterval);
       clearInterval(distInterval);
-      if (finishTimer) clearTimeout(finishTimer);
+      if (finishTriggerTimer) clearTimeout(finishTriggerTimer);
+      if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+      if (redundantSafetyTimer) clearTimeout(redundantSafetyTimer);
     };
-  }, [advanceState, setRevealData, setScore, attemptId, bonusClicksHit]);
+  }, [setGameState, setRevealData, setScore, attemptId, bonusClicksHit]);
 
   const handleNitroBoost = () => {
     if (nitroCharges <= 0 || isFinishing) return;
@@ -169,25 +193,6 @@ export default function RaceAnimation() {
           ))}
         </div>
 
-        {/* In-Scene 3D Holographic Finish Gate */}
-        <AnimatePresence>
-          {isFinishing && (
-            <motion.div
-              initial={{ scale: 0.1, y: -160, opacity: 0 }}
-              animate={{ scale: 2.5, y: 180, opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.85, ease: "easeIn" }}
-              className="absolute inset-0 z-40 flex flex-col items-center justify-center pointer-events-none"
-            >
-              <div className="px-8 py-4 rounded-3xl bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 border-4 border-white text-white font-mono font-black text-xl sm:text-3xl uppercase tracking-widest shadow-[0_0_80px_rgba(255,255,255,1)] flex items-center gap-3">
-                <span>🏁</span>
-                <span>FINISH LINE BREACHED!</span>
-                <span>🏆</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
       </div>
 
       {/* 2. DIEGETIC VISOR HUD (Floating Typography Over Track) */}
@@ -216,7 +221,7 @@ export default function RaceAnimation() {
         </div>
       </div>
 
-      {/* 3. ASSEMBLED 3D CHASE CAR */}
+      {/* 3. ASSEMBLED 3D CHASE CAR (MATCHING EXACT CHOSEN CREW) */}
       <div className="flex-1 relative flex items-center justify-center my-auto w-full z-20">
         <motion.div
           animate={{
@@ -253,13 +258,48 @@ export default function RaceAnimation() {
 
           <img 
             src={selectedCrew?.image || '/assets/crews/mcqueen.png'} 
-            alt="3D Assembled Speedway Champion" 
+            alt={selectedCrew?.name || "Assembled Race Car"} 
             className="w-full h-full object-contain filter drop-shadow-[0_25px_45px_rgba(0,0,0,0.98)] relative z-20 pointer-events-none"
           />
         </motion.div>
+
+        {/* 4. FLUID-SCALING HOLOGRAPHIC FINISH GATE (NO OVERFLOW AT 320PX-430PX) */}
+        <AnimatePresence>
+          {isFinishing && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-40 flex flex-col items-center justify-center p-3"
+            >
+              <div 
+                className="w-full max-w-[92vw] sm:max-w-md px-4 sm:px-8 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 border-2 sm:border-4 border-white text-white font-mono font-black uppercase tracking-wider shadow-[0_0_60px_rgba(245,158,11,0.9)] flex flex-col items-center gap-2 text-center"
+                style={{
+                  fontSize: 'clamp(1.1rem, 5.2vw, 1.85rem)',
+                  overflowWrap: 'break-word',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <span>🏁</span>
+                  <span>FINISH LINE REACHED!</span>
+                  <span>🏆</span>
+                </div>
+
+                {/* Manual Fallback Action Button */}
+                <button
+                  onClick={handleAdvanceToResults}
+                  className="mt-2 px-5 py-2 rounded-xl bg-black text-amber-300 border border-amber-300 font-sans text-xs sm:text-sm font-black tracking-wider uppercase shadow-xl hover:bg-slate-900 active:scale-95 transition-all cursor-pointer pointer-events-auto"
+                >
+                  <span>CONTINUE TO RESULTS ➔</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* 4. SPEEDOMETER & NITRO BOOST CONTROLS */}
+      {/* 5. SPEEDOMETER & NITRO BOOST CONTROLS */}
       <div className="relative z-30 max-w-4xl mx-auto w-full flex flex-col gap-2 font-mono">
         
         {/* Kinetic Warning Typography */}
