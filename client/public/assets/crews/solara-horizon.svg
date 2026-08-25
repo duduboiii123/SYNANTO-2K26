@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="solaraBodyGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="cyanAccentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="glassGradSolara" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="50%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="tireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="solaraShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="400" cy="415" rx="340" ry="25" fill="#000000" opacity="0.75" filter="blur(8px)"/>
+
+  <!-- CAR BODY GROUP -->
+  <g filter="url(#solaraShadow)">
+    <!-- High Aero GT Wing -->
+    <path d="M 110 175 L 85 125 L 230 120 L 250 170 Z" fill="url(#cyanAccentGrad)" stroke="#0369a1" stroke-width="3"/>
+    <path d="M 125 175 L 135 130 L 155 130 L 145 175 Z" fill="#b45309"/>
+    <path d="M 205 170 L 215 125 L 235 125 L 225 170 Z" fill="#b45309"/>
+
+    <!-- Main Aerodynamic Body Shell -->
+    <path d="M 100 330 C 80 270, 130 215, 200 195 C 270 145, 430 130, 570 170 C 670 190, 740 240, 755 310 C 765 345, 735 375, 680 375 L 140 375 C 110 375, 90 355, 100 330 Z" fill="url(#solaraBodyGrad)" stroke="#78350f" stroke-width="3"/>
+
+    <!-- Electric Cyan Racing Livery Wave -->
+    <path d="M 210 345 Q 390 265 540 285 L 610 275 Q 430 325 250 365 Z" fill="url(#cyanAccentGrad)" stroke="#e0f2fe" stroke-width="2"/>
+    <path d="M 280 355 L 360 300 L 410 300 L 340 360 Z" fill="#ffffff" opacity="0.85"/>
+
+    <!-- Cabin / Roof Shell -->
+    <path d="M 230 205 C 265 140, 385 125, 540 160 C 590 200, 610 240, 610 245 L 215 245 Z" fill="#f59e0b"/>
+
+    <!-- Windshield (Energetic Confident Eyes) -->
+    <path d="M 375 150 C 450 145, 530 160, 565 205 C 550 225, 490 230, 365 225 C 355 195, 360 165, 375 150 Z" fill="url(#glassGradSolara)" stroke="#0284c7" stroke-width="3"/>
+    
+    <!-- Left Eye -->
+    <ellipse cx="435" cy="185" rx="21" ry="25" fill="#ffffff"/>
+    <ellipse cx="438" cy="185" rx="13" ry="15" fill="#0891b2"/>
+    <ellipse cx="440" cy="185" rx="7" ry="9" fill="#0f172a"/>
+    <circle cx="443" cy="180" r="4" fill="#ffffff"/>
+    <!-- Right Eye -->
+    <ellipse cx="500" cy="190" rx="19" ry="23" fill="#ffffff"/>
+    <ellipse cx="503" cy="190" rx="12" ry="14" fill="#0891b2"/>
+    <ellipse cx="505" cy="190" rx="6" ry="8" fill="#0f172a"/>
+    <circle cx="508" cy="186" r="3.5" fill="#ffffff"/>
+    <!-- Confident Eyelids -->
+    <path d="M 410 170 Q 435 155 460 170" stroke="#b45309" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 480 175 Q 503 162 523 175" stroke="#b45309" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+    <!-- Front Nose & Smiling Grille -->
+    <path d="M 625 255 C 725 265, 755 305, 750 345 C 725 365, 655 365, 605 360 Z" fill="#d97706"/>
+    <!-- Smiling Grille -->
+    <path d="M 645 310 Q 695 350 740 315 Q 695 335 645 310 Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M 660 320 Q 695 340 725 323" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- High-Tech Headlights -->
+    <polygon points="640,255 680,270 665,285 630,270" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+    <polygon points="575,235 605,245 595,260 570,250" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- Racing Number #51 Decal -->
+    <g transform="matrix(0.95 0 -0.2 0.95 325 265)">
+      <text x="0" y="55" font-family="'Impact', 'Arial Black', sans-serif" font-size="68" font-weight="900" fill="#ffffff" stroke="#0369a1" stroke-width="6" font-style="italic">51</text>
+      <text x="0" y="55" font-family="'Impact', 'Arial Black', sans-serif" font-size="68" font-weight="900" fill="url(#cyanAccentGrad)" font-style="italic">51</text>
+    </g>
+
+    <!-- Side Racing Badges -->
+    <text x="210" y="325" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" letter-spacing="1">HORIZON SPRINT</text>
+
+    <!-- Front Wheel / Rim -->
+    <g>
+      <ellipse cx="615" cy="355" rx="55" ry="55" fill="url(#tireGrad)"/>
+      <ellipse cx="615" cy="355" rx="38" ry="38" fill="#e2e8f0" stroke="#0284c7" stroke-width="5"/>
+      <ellipse cx="615" cy="355" rx="20" ry="20" fill="#f59e0b"/>
+      <line x1="615" y1="317" x2="615" y2="393" stroke="#94a3b8" stroke-width="6"/>
+      <line x1="577" y1="355" x2="653" y2="355" stroke="#94a3b8" stroke-width="6"/>
+    </g>
+
+    <!-- Rear Wheel / Rim -->
+    <g>
+      <ellipse cx="195" cy="355" rx="65" ry="65" fill="url(#tireGrad)"/>
+      <ellipse cx="195" cy="355" rx="46" ry="46" fill="#e2e8f0" stroke="#0284c7" stroke-width="6"/>
+      <ellipse cx="195" cy="355" rx="24" ry="24" fill="#f59e0b"/>
+      <line x1="195" y1="309" x2="195" y2="401" stroke="#94a3b8" stroke-width="7"/>
+      <line x1="149" y1="355" x2="241" y2="355" stroke="#94a3b8" stroke-width="7"/>
+    </g>
+  </g>
+</svg>

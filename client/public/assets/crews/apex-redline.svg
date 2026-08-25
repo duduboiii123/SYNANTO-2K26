@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="apexBodyGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#ff2a2a"/>
+      <stop offset="50%" stop-color="#dc143c"/>
+      <stop offset="100%" stop-color="#8b0000"/>
+    </linearGradient>
+    <linearGradient id="apexGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="40%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#7dd3fc"/>
+    </linearGradient>
+    <linearGradient id="tireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d3748"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="carShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="400" cy="415" rx="340" ry="25" fill="#000000" opacity="0.75" filter="blur(8px)"/>
+
+  <!-- CAR BODY GROUP -->
+  <g filter="url(#carShadow)">
+    <!-- Rear Spoiler -->
+    <path d="M 120 185 L 100 135 L 240 130 L 260 180 Z" fill="url(#apexGoldGrad)" stroke="#b45309" stroke-width="3"/>
+    <path d="M 135 185 L 145 140 L 165 140 L 155 185 Z" fill="#8b0000"/>
+    <path d="M 215 180 L 225 135 L 245 135 L 235 180 Z" fill="#8b0000"/>
+
+    <!-- Main Aerodynamic Body Shell -->
+    <path d="M 110 330 C 90 280, 130 220, 200 200 C 260 150, 420 130, 560 170 C 660 190, 730 240, 750 310 C 760 345, 730 375, 680 375 L 150 375 C 120 375, 100 355, 110 330 Z" fill="url(#apexBodyGrad)" stroke="#7f1d1d" stroke-width="3"/>
+
+    <!-- Lightning / Flame Racing Swoosh Decal -->
+    <path d="M 220 340 Q 380 260 520 280 L 590 270 Q 420 320 260 360 Z" fill="url(#apexGoldGrad)" stroke="#fef08a" stroke-width="2"/>
+    <path d="M 320 340 L 390 285 L 430 285 L 370 345 Z" fill="#ffffff" opacity="0.8"/>
+
+    <!-- Cabin / Roof Shell -->
+    <path d="M 240 210 C 270 145, 380 130, 530 160 C 580 200, 600 240, 600 245 L 220 245 Z" fill="#dc143c"/>
+
+    <!-- Windshield (Expressive Friendly Eyes) -->
+    <path d="M 370 155 C 440 150, 520 165, 555 210 C 540 230, 480 235, 360 230 C 350 200, 355 170, 370 155 Z" fill="url(#glassGrad)" stroke="#0284c7" stroke-width="3"/>
+    
+    <!-- Left Eye -->
+    <ellipse cx="430" cy="190" rx="22" ry="26" fill="#ffffff"/>
+    <ellipse cx="434" cy="190" rx="14" ry="16" fill="#0284c7"/>
+    <ellipse cx="436" cy="190" rx="8" ry="10" fill="#0f172a"/>
+    <circle cx="439" cy="185" r="4" fill="#ffffff"/>
+    <!-- Right Eye -->
+    <ellipse cx="495" cy="195" rx="20" ry="24" fill="#ffffff"/>
+    <ellipse cx="498" cy="195" rx="13" ry="15" fill="#0284c7"/>
+    <ellipse cx="500" cy="195" rx="7" ry="9" fill="#0f172a"/>
+    <circle cx="503" cy="191" r="3.5" fill="#ffffff"/>
+    <!-- Expressive Eyelids -->
+    <path d="M 405 175 Q 430 160 455 175" stroke="#991b1b" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 475 180 Q 498 168 518 180" stroke="#991b1b" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+    <!-- Front Nose & Smiling Grille -->
+    <path d="M 620 260 C 720 270, 750 310, 745 350 C 720 370, 650 370, 600 365 Z" fill="#b91c1c"/>
+    <!-- Smiling Grille -->
+    <path d="M 640 315 Q 690 355 735 320 Q 690 340 640 315 Z" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+    <path d="M 655 325 Q 690 345 720 328" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- Headlights -->
+    <polygon points="635,260 675,275 660,290 625,275" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+    <polygon points="570,240 600,250 590,265 565,255" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+
+    <!-- Racing Number #95 Decal -->
+    <g transform="matrix(0.95 0 -0.2 0.95 320 270)">
+      <text x="0" y="55" font-family="'Impact', 'Arial Black', sans-serif" font-size="68" font-weight="900" fill="#ffffff" stroke="#9a3412" stroke-width="6" font-style="italic">95</text>
+      <text x="0" y="55" font-family="'Impact', 'Arial Black', sans-serif" font-size="68" font-weight="900" fill="url(#apexGoldGrad)" font-style="italic">95</text>
+    </g>
+
+    <!-- Side Racing Badges -->
+    <text x="210" y="325" font-family="sans-serif" font-size="12" font-weight="900" fill="#fde047" letter-spacing="1">SYNANTO APEX</text>
+
+    <!-- Front Wheel / Rim -->
+    <g>
+      <ellipse cx="610" cy="355" rx="55" ry="55" fill="url(#tireGrad)"/>
+      <ellipse cx="610" cy="355" rx="38" ry="38" fill="#e2e8f0" stroke="#b45309" stroke-width="5"/>
+      <ellipse cx="610" cy="355" rx="20" ry="20" fill="#dc2626"/>
+      <!-- Rim Spokes -->
+      <line x1="610" y1="317" x2="610" y2="393" stroke="#cbd5e1" stroke-width="6"/>
+      <line x1="572" y1="355" x2="648" y2="355" stroke="#cbd5e1" stroke-width="6"/>
+    </g>
+
+    <!-- Rear Wheel / Rim -->
+    <g>
+      <ellipse cx="200" cy="355" rx="65" ry="65" fill="url(#tireGrad)"/>
+      <ellipse cx="200" cy="355" rx="46" ry="46" fill="#e2e8f0" stroke="#b45309" stroke-width="6"/>
+      <ellipse cx="200" cy="355" rx="24" ry="24" fill="#dc2626"/>
+      <line x1="200" y1="309" x2="200" y2="401" stroke="#cbd5e1" stroke-width="7"/>
+      <line x1="154" y1="355" x2="246" y2="355" stroke="#cbd5e1" stroke-width="7"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hornetBodyGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="50%" stop-color="#172554"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="goldVintageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="glassGradHornet" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="tireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="hornetShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="400" cy="415" rx="340" ry="25" fill="#000000" opacity="0.75" filter="blur(8px)"/>
+
+  <!-- CAR BODY GROUP -->
+  <g filter="url(#hornetShadow)">
+    <!-- Classic Round Coupe Body Shell -->
+    <path d="M 110 330 C 90 260, 130 200, 220 185 C 290 135, 450 120, 580 160 C 670 180, 740 230, 755 305 C 765 340, 735 375, 680 375 L 140 375 C 110 375, 90 355, 110 330 Z" fill="url(#hornetBodyGrad)" stroke="#1e293b" stroke-width="3"/>
+
+    <!-- Gold Vintage Pinstripe Heritage Livery -->
+    <path d="M 140 290 Q 380 270 730 290" stroke="url(#goldVintageGrad)" stroke-width="5" fill="none"/>
+    <path d="M 150 300 Q 380 280 720 300" stroke="url(#goldVintageGrad)" stroke-width="2" fill="none"/>
+
+    <!-- Cabin / Roof Shell -->
+    <path d="M 240 195 C 280 130, 400 115, 550 150 C 595 190, 610 235, 610 240 L 225 240 Z" fill="#172554"/>
+
+    <!-- Windshield (Calm, Wise Veteran Windshield Eyes) -->
+    <path d="M 380 140 C 455 135, 535 150, 570 195 C 555 215, 495 220, 370 215 C 360 185, 365 155, 380 140 Z" fill="url(#glassGradHornet)" stroke="#64748b" stroke-width="3"/>
+    
+    <!-- Left Eye -->
+    <ellipse cx="440" cy="178" rx="20" ry="24" fill="#ffffff"/>
+    <ellipse cx="443" cy="178" rx="12" ry="14" fill="#1e3a8a"/>
+    <ellipse cx="445" cy="178" rx="6" ry="8" fill="#0f172a"/>
+    <circle cx="448" cy="173" r="3.5" fill="#ffffff"/>
+    <!-- Right Eye -->
+    <ellipse cx="505" cy="183" rx="18" ry="22" fill="#ffffff"/>
+    <ellipse cx="508" cy="183" rx="11" ry="13" fill="#1e3a8a"/>
+    <ellipse cx="510" cy="183" rx="5" ry="7" fill="#0f172a"/>
+    <circle cx="513" cy="179" r="3" fill="#ffffff"/>
+    <!-- Calm Veteran Eyelids -->
+    <path d="M 415 168 Q 440 158 465 168" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 485 172 Q 508 164 528 172" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+    <!-- Classic Chrome Smiling Grille -->
+    <path d="M 630 250 C 730 260, 755 300, 750 345 C 725 365, 655 365, 605 360 Z" fill="#0f172a"/>
+    <!-- Chrome Grille Ribs -->
+    <path d="M 645 305 Q 695 345 740 310 Q 695 330 645 305 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M 660 312 L 660 330" stroke="#475569" stroke-width="3"/>
+    <path x1="680" y1="312" x2="680" y2="335" stroke="#475569" stroke-width="3"/>
+    <path x1="700" y1="312" x2="700" y2="335" stroke="#475569" stroke-width="3"/>
+    <path x1="720" y1="312" x2="720" y2="328" stroke="#475569" stroke-width="3"/>
+
+    <!-- Round Chrome Headlights -->
+    <circle cx="655" cy="270" r="18" fill="#fef08a" stroke="#e2e8f0" stroke-width="4"/>
+    <circle cx="585" cy="245" r="15" fill="#fef08a" stroke="#e2e8f0" stroke-width="3"/>
+
+    <!-- Classic Fabulous Script Decal -->
+    <g transform="matrix(0.9 0 -0.15 0.9 250 290)">
+      <text x="0" y="30" font-family="'Georgia', serif" font-size="28" font-weight="900" font-style="italic" fill="url(#goldVintageGrad)" stroke="#1e293b" stroke-width="1">FABULOUS</text>
+      <text x="10" y="60" font-family="'Impact', 'Arial Black', sans-serif" font-size="44" font-weight="900" fill="url(#goldVintageGrad)" stroke="#1e293b" stroke-width="2">HORNET 51</text>
+    </g>
+
+    <!-- Front Classic Whitewall Wheel / Rim -->
+    <g>
+      <ellipse cx="615" cy="355" rx="55" ry="55" fill="url(#tireGrad)"/>
+      <ellipse cx="615" cy="355" rx="46" ry="46" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+      <ellipse cx="615" cy="355" rx="28" ry="28" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="3"/>
+      <ellipse cx="615" cy="355" rx="14" ry="14" fill="#fbbf24"/>
+    </g>
+
+    <!-- Rear Classic Whitewall Wheel / Rim -->
+    <g>
+      <ellipse cx="205" cy="355" rx="65" ry="65" fill="url(#tireGrad)"/>
+      <ellipse cx="205" cy="355" rx="54" ry="54" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+      <ellipse cx="205" cy="355" rx="34" ry="34" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="4"/>
+      <ellipse cx="205" cy="355" rx="18" ry="18" fill="#fbbf24"/>
+    </g>
+  </g>
+</svg>

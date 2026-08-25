@@ -11,9 +11,7 @@ const GAME_STATES = [
   'BUILD_4',
   'BUILD_5',
   'CAR_COMPLETE',
-  'START_PRESSED',
   'RACING',
-  'REVEAL',
   'FINAL_POSTER'
 ];
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function CarSVG({ 
   stage = 1, 
@@ -8,6 +8,7 @@ export default function CarSVG({
   crewSlug = "mcqueens-racers",
   children 
 }) {
+  const [imageError, setImageError] = useState(false);
   const primary = crewColors.primary || '#ef4444';
 
   const getCarImage = () => {
@@ -20,7 +21,7 @@ export default function CarSVG({
   return (
     <div className={`relative w-full flex items-center justify-center select-none ${className}`}>
       
-      {/* Hero Car Bounding Container: Occupies 85-92% Width on Mobile, Perfectly Centered */}
+      {/* Hero Car Bounding Container */}
       <div className="relative w-full max-w-[340px] xs:max-w-[380px] sm:max-w-[500px] md:max-w-[560px] aspect-[16/9] flex items-center justify-center mx-auto">
         
         {/* Asphalt Pit Bay Ground Shadow */}
@@ -32,12 +33,21 @@ export default function CarSVG({
           style={{ backgroundColor: primary }}
         ></div>
 
-        {/* Hero 3D Car Image - 100% Horizontal, Natural, Stationary */}
-        <img 
-          src={getCarImage()} 
-          alt="Pit Garage Race Car" 
-          className="w-full h-full object-contain object-center filter drop-shadow-[0_16px_25px_rgba(0,0,0,0.9)] relative z-10 pointer-events-none"
-        />
+        {/* Hero Character Car Image */}
+        {!imageError ? (
+          <img 
+            src={getCarImage()} 
+            alt="Pit Garage Race Car" 
+            onError={() => setImageError(true)}
+            className="w-full h-full object-contain object-center filter drop-shadow-[0_16px_25px_rgba(0,0,0,0.9)] relative z-10 pointer-events-none"
+          />
+        ) : (
+          <div className="w-full h-full rounded-2xl border-2 border-dashed border-amber-400/60 bg-black/70 flex flex-col items-center justify-center text-amber-300 font-mono text-xs z-10 p-4 text-center">
+            <span className="text-2xl mb-1">🏎️</span>
+            <span className="font-bold uppercase tracking-wider">{crewSlug}</span>
+            <span className="text-[10px] text-slate-400 mt-0.5">Asset Missing State</span>
+          </div>
+        )}
 
         {/* Interactive Clickable Target Buttons Mounted Directly on Car Body */}
         {children}

@@ -7,13 +7,14 @@ export default function CarComplete() {
   const { selectedCrew, advanceState, playerName, bonusClicksHit } = useGameStore();
   const [isLaunching, setIsLaunching] = useState(false);
   const [statsRevealed, setStatsRevealed] = useState([false, false, false, false]);
+  const [imageError, setImageError] = useState(false);
 
   const primary = selectedCrew?.colorPrimary || '#ef4444';
   const secondary = selectedCrew?.colorSecondary || '#f59e0b';
+  const carImageSrc = selectedCrew?.image || '/assets/crews/apex-redline.svg';
 
   useEffect(() => {
     sound.playStageComplete();
-    // Staggered reveal of the 4 stat cards
     const timers = [
       setTimeout(() => setStatsRevealed(prev => [true, false, false, false]), 200),
       setTimeout(() => setStatsRevealed(prev => [true, true, false, false]), 400),
@@ -93,7 +94,7 @@ export default function CarComplete() {
         </motion.h1>
       </div>
 
-      {/* 2. HERO CENTERPIECE: Upright, Massive 85-92% Width Car on Magnetic Jack Pad */}
+      {/* 2. HERO CENTERPIECE: Upright, Massive Car on Magnetic Jack Pad */}
       <div className="relative w-full max-w-sm sm:max-w-md my-auto flex flex-col items-center justify-center z-10 py-1">
         
         <div className="absolute bottom-2 w-4/5 h-14 flex items-center justify-center pointer-events-none">
@@ -120,7 +121,7 @@ export default function CarComplete() {
           className="absolute bottom-4 w-3/4 h-5 rounded-[100%] bg-black/95 blur-md pointer-events-none z-10"
         />
 
-        {/* Upright Centered 3D Car */}
+        {/* Upright Centered Original Car */}
         <motion.div
           animate={
             isLaunching 
@@ -134,11 +135,20 @@ export default function CarComplete() {
           }
           className="relative z-20 w-full aspect-[16/9] flex items-center justify-center"
         >
-          <img 
-            src={selectedCrew?.image || '/assets/crews/mcqueen.png'} 
-            alt="3D Assembled Race Car" 
-            className="w-full h-full object-contain object-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)] pointer-events-none"
-          />
+          {!imageError ? (
+            <img 
+              src={carImageSrc} 
+              alt={selectedCrew?.name || "Assembled Original Race Car"} 
+              onError={() => setImageError(true)}
+              className="w-full h-full object-contain object-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)] pointer-events-none"
+            />
+          ) : (
+            <div className="w-full h-full rounded-2xl border-2 border-dashed border-amber-400/70 bg-black/80 flex flex-col items-center justify-center text-amber-300 font-mono text-xs z-20 p-4 text-center">
+              <span className="text-3xl mb-1">🏎️</span>
+              <span className="font-black uppercase">{selectedCrew?.name || "Original Car"}</span>
+              <span className="text-[10px] text-slate-400 mt-0.5">Asset Missing State</span>
+            </div>
+          )}
         </motion.div>
 
         {/* Driver & Crew Stamped Callsign */}
