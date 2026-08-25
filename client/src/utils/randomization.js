@@ -24,12 +24,12 @@ const PARTS = [
 ];
 
 const TOOLS = [
-  { name: 'Pneumatic Impact Gun', icon: '🔧', material: 'Cast Iron & Brushed Steel' },
-  { name: 'Laser Calibration Wrench', icon: '💡', material: 'Anodized Cyan Aluminum' },
-  { name: 'Carbon Fiber Clamp', icon: '🛡️', material: 'Carbon Fiber & Titanium' },
-  { name: 'Precision Digital Torque Driver', icon: '⚙️', material: 'High-Tensile Chrome Vanadium' },
-  { name: 'Induction Thermal Sealer', icon: '⚡', material: 'Copper Thermal Nozzle' },
-  { name: 'Optical Telemetry Gauge', icon: '🌟', material: 'Sapphire Crystal Dial' }
+  { name: 'Pneumatic Impact Gun', type: 'HOLD', icon: '🔧', material: 'Cast Iron & Brushed Steel' },
+  { name: 'Laser Calibration Wrench', type: 'TAP', icon: '💡', material: 'Anodized Cyan Aluminum' },
+  { name: 'Carbon Fiber Clamp', type: 'HOLD', icon: '🛡️', material: 'Carbon Fiber & Titanium' },
+  { name: 'Precision Digital Torque Driver', type: 'TAP', icon: '⚙️', material: 'High-Tensile Chrome Vanadium' },
+  { name: 'Induction Thermal Sealer', type: 'HOLD', icon: '⚡', material: 'Copper Thermal Nozzle' },
+  { name: 'Optical Telemetry Gauge', type: 'TAP', icon: '🌟', material: 'Sapphire Crystal Dial' }
 ];
 
 /**
@@ -45,9 +45,10 @@ export function getRandomTapPosition() {
 /**
  * Generate 5 dynamic build stages with randomized unique tasks and dynamic tap areas
  */
-export function generateSessionStages() {
+export function generateSessionStages(difficulty = 'MEDIUM') {
   const shuffledParts = [...PARTS].sort(() => 0.5 - Math.random());
   const stages = [];
+  const isHard = difficulty === 'HARD';
 
   for (let stageNum = 1; stageNum <= 5; stageNum++) {
     const taskCount = stageNum === 1 ? 2 : stageNum === 5 ? 4 : 3;
@@ -57,19 +58,24 @@ export function generateSessionStages() {
       const part = shuffledParts[(stageNum * 2 + t) % shuffledParts.length];
       const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
       const tool = TOOLS[Math.floor(Math.random() * TOOLS.length)];
-      const points = 90 + Math.floor(Math.random() * 60); // 90 to 150 pts
-      const targetSec = 8 + Math.floor(Math.random() * 7);
+      
+      // In HARD mode, include both HOLD tasks and TAP tasks!
+      // In EASY / MEDIUM mode, keep it tap-based.
+      const actionType = isHard ? (t % 2 === 1 ? 'HOLD' : 'TAP') : 'TAP';
+      
+      const basePoints = difficulty === 'EASY' ? 150 : difficulty === 'HARD' ? 120 : 130;
 
       stageTasks.push({
         id: t,
         label: `${action} ${part.name}`,
         detail: `Use ${tool.name} to ${action.toLowerCase()} the ${part.name.toLowerCase()} at target coordinates.`,
+        actionType,
         toolName: tool.name,
         toolMaterial: tool.material,
         toolIcon: tool.icon,
         icon: part.icon,
-        points,
-        targetSec,
+        points: basePoints,
+        basePoints,
         pos: getRandomTapPosition()
       });
     }

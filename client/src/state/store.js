@@ -22,9 +22,10 @@ export const useGameStore = create((set, get) => ({
   selectedCrew: ORIGINAL_CREWS[0],
   userId: null,
   attemptId: null,
+  difficulty: 'MEDIUM',
   
   crews: ORIGINAL_CREWS,
-  generatedStages: generateSessionStages(),
+  generatedStages: generateSessionStages('MEDIUM'),
   currentBuildStage: 0,
   bonusClicksHit: 0,
   totalComponentsInstalled: 0,
@@ -39,6 +40,11 @@ export const useGameStore = create((set, get) => ({
 
   setGameState: (state) => set({ gameState: state }),
   
+  setDifficulty: (diff) => set({
+    difficulty: diff,
+    generatedStages: generateSessionStages(diff)
+  }),
+
   advanceState: () => {
     const current = get().gameState;
     const idx = GAME_STATES.indexOf(current);
@@ -77,7 +83,7 @@ export const useGameStore = create((set, get) => ({
     gameState: 'CREW_SELECT',
     playerName: '',
     selectedCrew: ORIGINAL_CREWS[0],
-    generatedStages: generateSessionStages(),
+    generatedStages: generateSessionStages(get().difficulty || 'MEDIUM'),
     userId: null,
     attemptId: null,
     currentBuildStage: 0,

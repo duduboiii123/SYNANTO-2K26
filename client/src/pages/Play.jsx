@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameStore } from '../state/store';
+import { eventApi } from '../api/client';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import CrewSelect from '../components/crew/CrewSelect';
@@ -10,7 +11,20 @@ import RevealScreen from '../components/race/RevealScreen';
 import FinalPoster from '../components/race/FinalPoster';
 
 export default function Play() {
-  const gameState = useGameStore(state => state.gameState);
+  const { gameState, setDifficulty } = useGameStore();
+
+  // Sync active live difficulty from backend
+  useEffect(() => {
+    eventApi.getConfig()
+      .then(res => {
+        if (res?.data?.difficulty) {
+          setDifficulty(res.data.difficulty);
+        }
+      })
+      .catch(err => {
+        console.warn('Difficulty sync fallback to local mode:', err.message);
+      });
+  }, [setDifficulty]);
 
   const renderCurrentScreen = () => {
     if (gameState === 'CREW_SELECT') {
@@ -58,7 +72,7 @@ export default function Play() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="flex-1 flex flex-col"
+          className="flex-1 flex flex-col w-full"
         >
           {renderCurrentScreen()}
         </motion.div>
